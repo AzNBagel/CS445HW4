@@ -49,21 +49,18 @@ def gaussian_naive_bayes(filename="spambase.data"):
     # Rejoin the data for test set.
     test_data = np.vstack((pos_test, neg_test))
 
-    pos_test = np.copy(test_data[:, :-1])
-
     # Calculating the positive values of STD and MEAN
+    pos_test = np.copy(test_data[:, :-1])
     pos_test = np.exp(-((pos_test - pos_mean) ** 2.0) / (2.0 * (pos_std ** 2)))
-    pos_test[pos_test == 0] = .0000000000000000000000000000000000000001
+    pos_test[pos_test == 0] = np.exp(-700)
     pos_test = (1.0 / (np.sqrt(2.0 * np.pi)) * pos_std) * pos_test
-
     pos_results = np.sum(np.log10(pos_test), axis=1)
 
     # Negative values of STD and MEAN
     neg_test = np.copy(test_data[:, :-1])
     neg_test = np.exp(-(((neg_test - neg_mean) ** 2.0) / (2.0 * (neg_std ** 2))))
-    neg_test[neg_test == 0] = .0000000000000000000000000000000000000001
+    neg_test[neg_test == 0] = np.exp(-700)
     neg_test = (1.0 / (np.sqrt(2.0 * np.pi) * neg_std)) * neg_test
-
     neg_results = np.sum(np.log10(neg_test), axis=1)
 
     print(len(pos_test))
@@ -84,10 +81,29 @@ def gaussian_naive_bayes(filename="spambase.data"):
     test_recall = metrics.recall_score(test_data[:, -1], classification)
     test_precision = metrics.precision_score(test_data[:, -1], classification)
 
-    print("Accuracy: " + str(test_accuracy))
-    print("Recall: " + str(test_recall))
-    print("Precision: " + str(test_precision))
+    # Confusion Matrix
+    c_matrix = np.zeros(shape=(2,2), dtype=int)
+    for i in range(len(classification)):
+        if classification[i] == test_data[i,-1]:
+            # True Neg
+            if classification[i] == 0:
+                c_matrix[1,1] += 1
+            # True Pos
+            else:
+                c_matrix[0,0] += 1
+        else:
+            if classification[i] == 0:
+                # False Neg
+                c_matrix[0,1] += 1
+            else:
+                # False Pos
+                c_matrix[1,0] += 1
 
-    return
+
+    print("Accuracy: ", test_accuracy*100)
+    print("Recall: ", test_recall*100)
+    print("Precision: ", test_precision*100)
+    print(c_matrix)
+
 
 gaussian_naive_bayes()
