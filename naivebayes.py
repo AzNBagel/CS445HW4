@@ -43,8 +43,8 @@ def gaussian_naive_bayes(filename="spambase.data"):
     print(pos_prior)
 
     # Correct any underflow errors.
-    pos_std[pos_std == 0] = .00000000000000001
-    neg_std[neg_std == 0] = .00000000000000001
+    pos_std[pos_std == 0] = .1
+    neg_std[neg_std == 0] = .1
 
     # Rejoin the data for test set.
     test_data = np.vstack((pos_test, neg_test))
